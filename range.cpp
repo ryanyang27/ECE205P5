@@ -75,7 +75,7 @@ double interpolateMin( std::function<double( double )> f, double lowRange, doubl
     }
     double xkpo = (xk + xko)/2.0 + (fxk - fxko)*(xko - xkt)*(xkt-xk)/(2.0*((fxk-fxko)*(xko-xkt)+(fxkt-fxko)*(xk-xko)));
     double fxkpo = f(xkpo);
-    if (abs(fxkpo-fxk) <= 1.0e-8 && abs(xkpo - xk) <= 1.0e-10) {
+    if (abs(fxkpo-fxk) <= 1.0e-6 && abs(xkpo - xk) <= 1.0e-8) {
         if (xkpo > xk) {
             return fxk;
         } else {
@@ -169,11 +169,19 @@ double interpolateMax( std::function<double( double )> f, double lowRange, doubl
 
 
 double sine(double x) {
-    return sin(5*x) + sin(2*x+1);
+    static unsigned long count{0};
+
+    if (x == INFINITY) {
+        return count;
+    } else {
+        ++count;
+        return sin(x) + sin(2*x+1);
+    }
 }
 
 int main() {
     double (*f)(double);
     f = &sine;
-    std::cout << range(f, 0, 10, 2*M_PI/5) << std::endl;
+    std::cout << range(f, 0, 10, M_PI) << std::endl;
+    std::cout << sine(INFINITY) << std::endl;
 }
